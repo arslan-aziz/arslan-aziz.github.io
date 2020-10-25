@@ -2,12 +2,23 @@
 layout: default
 title: Blog
 ---
+<style>
+  ul {
+    list-style-type: none;
+  }
+  ul li:before {
+    content: '\2014';
+    position: absolute;
+    margin-top: 5px;
+    margin-left: -20px;
+  }
+</style>
 <h1>Latest Posts</h1>
 
 <ul>
   {% for post in site.posts %}
     <li>
-      <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+      <h2><a href="{{ post.url }}" style="color: black;">{{ post.title }}</a></h2>
       {{ post.excerpt }}
     </li>
   {% endfor %}

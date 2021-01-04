@@ -1,7 +1,8 @@
 ---
 layout: default
 ---
-<h1>{{ page.title }}</h1>
-<p>{{ page.date | date_to_string }} - {{ page.author }}</p>
-
-{{ content }}
+<div class="post container-flex ml-5 mr-5">
+    <h1 class="aboutme-font">{{ page.title }}</h1>
+    <p class="aboutme-size-font">{{ page.date | date_to_string }}</p>
+    {{content}}
+</div>

@@ -1,0 +1,49 @@
+Some notes on how to write my blog post(s) on my Bayesian Statistics Course Final project:
+
+1. What is the aim?
+    - Share my understanding of Bayesian statistics (theory and example).
+    - Demonstrate my knowledge of Bayesian statistics.
+
+2. What are the major parts of my project?
+    - Data munging:
+    - Bayesian regression:
+    - GP regression:
+    - Model evaluation:
+    - Modeling results (comparison):
+    - Using PyMC3: 
+
+3. What's missing?
+    - Comparison with traditional regression approach:
+
+4. Flow of the post
+    - Title: Using Bayesian Methods and PyMC3 to Predict Flu Incidence: Part 1
+    - Flow
+        - Prologue
+            - Background on why this was done
+            - What is this series of posts going to talk about?
+                - Each post will go conceptual -> implementation -> results
+                - Overview of parts
+                    - Prologue (you are here): problem setup and data
+                    - Part 1: Bayesian Regression
+                    - Part 2: Bayesian model eval and selection
+                    - Part 3: GP Regression
+            - Where to find more detail? (check the github)
+            - Problem setup
+                - Data sources
+                - Data schema and attributes
+            
+        - Part 1
+            - Bayesian Regression concepts
+                -
+            - Fitting bayes regression models in PyMC3
+            - Next post
+        - Part 2
+            - Model evaluation
+            - Model selection techniques
+            - Evaluating and selecting models in PyMC3
+            - Next post
+        - Part 3
+            - GP regression concepts
+            - Fitting GP models in PyMC3
+            - Conclusion
+                - Comparison of all approaches.

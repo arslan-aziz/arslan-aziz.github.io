@@ -1,0 +1,39 @@
+---
+layout: post
+author: Arslan Aziz
+title: Using Bayesian Methods and PyMC3 to Predict Flu Incidence&#58; Prologue
+date: 2020-01-05
+excerpt: > 
+    <p class="aboutme-size-font">
+        Are you someone who's familiar with frequentist statistics but has always been curious about the "other camp"? Well so was I...
+    </p>
+---
+<hr>
+<p class="aboutme-size-font">
+    Are you someone who's familiar with frequentist statistics but has always been curious about the "other camp"? Well so was I, which is why I took the
+    course ISYE 6420: Bayesian Statistics as one of my first classes as part of 
+    <a href="url">Georgia Tech Online Master's of Science in Computer Science (OMSCS)</a> in Fall 2020. For my final project, I was interested in using Bayesian
+    methods for prediction, especially in a time series context, and a health application captured my interest given by background in biomedical engineering.
+    <br><br>
+
+    This post serves to kick off a series where I will discuss the work I did in this project and will touch on both Bayesian theory and implementation in PyMC3.
+    The four parts will be as follows:
+</p>
+    <ol class="aboutme-size-font">
+        <li>Prologue (You are here): Who, what, where, why and when?</li>
+        <li>Part 1: Bayesian Regression - Linear regression's cooler cousin.</li>
+        <li>Part 2: Bayesian Model Selection and Evaluation - The ML practitioner stuff.</li>
+        <li>Part 3: Gaussian Process Regression - A different frame of mind.</li>
+    </ol>
+    <br>
+<p class="aboutme-size-font">
+    To kick this off, I want to first give you a quick breakdown of the data I used and how I pulled it together. You can find source code at the 
+    <a style="color:inherit" href="url">Github <i class="fa fa-github-square" style="font-size:28px"></i> repository here.</a>
+    <br><br>
+
+    What we're trying to achieve is a Bayesian function approximator as follows:<br>
+    \(FluIncidence = f(X_1, X_2, X_3, ..., X_k)\)
+
+    I gathered data from four sources to capture the response variable (flu incidence) as well as covariates that could be useful in prediction
+    based on a literature review of flu incidence analytics (or more broadly syndromic surveillance).
+</p>

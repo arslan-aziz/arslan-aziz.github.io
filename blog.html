@@ -17,7 +17,7 @@ title: Blog
     }
   </style>
   <div class="bg-secondary">
-    <h1 style="color: white; margin-left: 100px; font-size:2vw;" class="aboutme-font">
+    <h1 style="color: white; margin-left: 100px;" class="aboutme-font">
       Explorations deep dives, and ramblings on technology and data science...<br><br>
     </h1>
   </div>
@@ -25,7 +25,7 @@ title: Blog
   <ul class="aboutme-font">
     {% for post in site.posts %}
       <li>
-        <h2><a href="{{ post.url }}" style="color: black;"><u>{{ post.title }}</u></a></h2>
+        <h3><a href="{{ post.url }}" style="color: black;"><u>{{ post.title }}</u></a></h3>
         <p class="aboutme-font">{{ post.date | date: "%m/%d/%Y"}}</p>
         {{ post.excerpt}}
       </li>

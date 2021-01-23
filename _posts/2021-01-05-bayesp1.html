@@ -1,0 +1,89 @@
+---
+layout: post
+author: Arslan Aziz
+title: Using Bayesian Methods and PyMC3 to Predict Flu Incidence&#58; Prologue
+date: 2021-01-05
+excerpt: > 
+    <p class="aboutme-size-font">
+        Are you someone who's familiar with frequentist statistics but has always been curious about the "other camp"? Well so was I...
+    </p>
+---
+<hr>
+<p class="aboutme-size-font">
+    Are you someone who's familiar with frequentist statistics but has always been curious about the "other camp"? Well so was I, which is why I took the
+    course ISYE 6420: Bayesian Statistics as one of my first classes as part of 
+    <a href="url">Georgia Tech Online Master's of Science in Computer Science (OMSCS)</a> in Fall 2020. For my final project, I was interested in using Bayesian
+    methods for prediction, especially in a time series context, and a health application captured my interest given by background in biomedical engineering.
+    <br><br>
+
+    This post serves to kick off a series where I will discuss the work I did in this project and will touch on both Bayesian theory and implementation in PyMC3.
+    The four parts will be as follows:
+</p>
+    <ol class="aboutme-size-font">
+        <li>Prologue (You are here): Who, what, where, why and when?</li>
+        <li>Part 1: Bayesian Regression - Linear regression's cooler cousin.</li>
+        <li>Part 2: Bayesian Model Selection and Evaluation - The ML practitioner stuff.</li>
+        <li>Part 3: Gaussian Process Regression - A different frame of mind.</li>
+    </ol>
+    <br>
+<p class="aboutme-size-font">
+    To kick this off, I want to first give you a quick breakdown of the data I used and how I pulled it together.
+    I gathered data from four sources to capture the response variable (flu incidence) as well as covariates that could be useful in prediction
+    based on a literature review of flu incidence analytics (or more broadly syndromic surveillance). Important factors included external factors such
+    as season and population density as well as an individual's personal health. The following data sources were identified:
+</p>
+<div class="table-responsive" style="overflow-x:auto;">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Data Source</th>
+                <th scope="col">Features</th>
+                <th scope="col">Temporal Resolution</th>
+                <th scope="col">Spatial Resolution</th>
+                <th scope="col">Data Source Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="url">CDC FluView</a></td>
+                <td># of patients with influenza-like-illness (ILI)</td>
+                <td>Weekly</td>
+                <td>U.S. State</td>
+                <td>Bulk Download</td>
+            </tr>
+            <tr>
+                <td><a href="url">NOAA Climate Data Online</a></td>
+                <td>Wind speed; Precipitation; Avg. Temperature; Min. Temperature; Max. Temperature</td>
+                <td>Daily</td>
+                <td>Field station</td>
+                <td>REST API</td>
+            </tr>
+            <tr>
+                <td><a href="url">U.S. Bureau of Labor Statistics</a></td>
+                <td>Unemployed population; Total population</td>
+                <td>Monthly</td>
+                <td>U.S. State</td>
+                <td>FTP</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<p class="aboutme-size-font"> 
+    Unemploymed population was included to capture the mental and health effects of economic stress with which unemployment 
+    has been shown to be strongly correlated. Data were pulled accordingly with the Data Source Type and aggregated
+    to the monthly and U.S. state levels. 
+    <br><br>
+    Thanks for reading up to this point! You can find source code for data transformations and the rest of the project as well at the 
+    <a style="color:inherit" href="https://github.com/arslan-aziz/ISYE6420BayesProject" target="_blank">
+        <u>Github</u> <i class="fa fa-github-square" style="font-size:28px"></i> <u>repository here.</u>
+    </a>
+    In the next post we'll discuss Bayesian linear regression and dive into our first implementation using Bayesian methods to fit
+    the following regression equation:<br>
+</p>
+
+<div style="overflow-x: auto; display: block;">
+    <p>
+        \[ILI = \beta_0+ \beta_1 \times Precip+ \beta_2 \times AvgTemp+ \beta_3 \times AvgWind+ \beta_4 \times Unemp+ \beta_5 \times Pop+ \beta_6 \times NumProviders+ \beta_7 \times NumPatients\]
+    </p>
+</div>
+

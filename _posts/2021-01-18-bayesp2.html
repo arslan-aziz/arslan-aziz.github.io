@@ -1,0 +1,150 @@
+---
+layout: post
+author: Arslan Aziz
+title: Using Bayesian Methods and PyMC3 to Predict Flu Incidence&#58; Part 1
+date: 2021-01-18
+excerpt: > 
+    <p class="aboutme-size-font">
+        In Part 1 of our exploration we'll discuss the concepts behind Bayesian regression and implementation in PyMC3.
+    </p>
+---
+<hr>
+<p class="aboutme-size-font">
+    In Part 1 of our exploration we'll discuss the concepts behind Bayesian regression and implementation in PyMC3. This post assumes basic familiarity
+    with statistical concepts such as priors, posteriors, and likelihoods. If you're wondering how you got here or what I'm talking about, check out my first post
+    <a href="https://arslan-aziz.com/2020/01/05/bayesp1.html">here!</a>
+    <br>
+    <br>
+    So to kick it off let's discuss at a high-level how we can go from frequentist linear regression to Bayesian regression.
+    Linear regression is a framework that models a response variable (potentially multivariate) with a combination of covariates linear in the parameters. 
+    Regression is a flexible approach that is extensible to many experimental designs as well as for a variety of data situations. 
+    Ordinary least squares (OLS) regression is the simplest instantiation of the regression model which makes strong assumptions about the 
+    data generating process underlying the population from which samples are drawn. Extensions of OLS such as generalized linear models,
+    linear mixed models, generalized additive models and others broaden these assumptions to account for a more flexible class of data 
+    generating processes. However, frequentist methods for fitting regression models can have disadvantages in their flexibility and interpretability.
+    <br>
+    <br>
+    Bayesian regression presents a flexible framework for regression modeling using the same probabilistic
+    principles from the simplest to most complex models. The key principle, as in all of Bayesian statistics,
+    is that priors are placed on all parameters which are updated via the likelihood to produce parameter
+    posteriors. The advantages are that priors can capture relevant domain information of the problem
+    space and the posteriors being distributions present natural measures of uncertainty for the parameters.
+    Additionally, hierarchical models can be specified by setting priors on priors (also known as
+    hyperpriors) which further incorporates knowledge of the experimental structure into the model.
+    Prediction is performed via the posterior predictive distribution of the new observation by integrating
+    the product of the new observation likelihood and parameter posterior over the parameters. This leads
+    to a easy measure of uncertainty for the prediction since the posterior predictive is a distribution.
+    <br>
+    <br>
+    On to the equations! Previously we determined that the linear model we were trying to fit was the following:
+</p>
+<div style="overflow-x: auto; display: block;">
+    <p>
+        \[ILI = \beta_0+ \beta_1 \times Precip+ \beta_2 \times AvgTemp+ \beta_3 \times AvgWind+ \beta_4 \times Unemp+ \beta_5 \times Pop+ \beta_6 \times NumProviders+ \beta_7 \times NumPatients + \epsilon(\sigma) \]
+    </p>
+</div>
+<p>
+    In the Bayesian context we treat the regression coefficients as well as parameters for the error term epsilon as random variables, thus each needs a prior. 
+    A typical choice of prior for the error term is the HalfCauchy which is parametrized by scale parameter beta. A larger beta value widens the distribution resulting in a
+    more non-informative prior. On the regression coefficients a typical choice of prior is the multivariate normal distribution (MVN) with dimensionality equal
+    to the number of coefficients. As opposed to independent priors on each coefficient, MVN imposes regularization on the coefficients by specification
+    of its covariance matrix. In fact a covariance matrix that is the identity matrix induces L2 regularization (aka ridge regression).
+</p>
+<div style="overflow-x: auto; display: block;">
+    <p>
+        \[ \vec\beta \sim MVN(\vec0, \Sigma) \]
+    </p>
+    <p>
+        \[ \sigma \sim HalfCauchy(\beta) \]
+    </p>
+</div>
+
+<p>
+    Phew, that was quite a bit of ground to cover. Let's put this into code now. 
+</p>
+
+
+<p>
+    We need the following imports for data manipulation, modeling, and plotting.
+</p>
+<div>
+    <pre><code>
+        import pymc3 as pm
+        import pandas as pd
+        import numpy as np
+        import arviz as az
+        import matplotlib.pyplot as plt
+        import scipy as sp
+        from sklearn.preprocessing import StandardScaler
+        from theano import shared
+    </code></pre>
+</div>
+<p>
+    Our time-series is of length 120 so we use the first 100 observations for training. Our input numpy array <code>data_mat</code> contains all features
+    and the response variable.
+</p>
+<div>
+    <pre><code>
+        num_obs = data_mat.shape[0]
+        num_train = 100
+        num_test = num_obs - num_train
+        num_feats = data_mat.shape[1] - 1
+        X_train = data_mat[:num_train, 1:]
+        y_train = data_mat[:num_train, 0]
+        X_test = data_mat[num_train:, 1:]
+        y_test = data_mat[num_train:, 0]
+    </code></pre>
+</div>
+<p>
+We first instantiate a PyMC Model object and within its context we define our model. We need to specify distributions for all random variables
+we noted as well as the sampling distribution of our observations (regression function). We also set parameters for our MCMC sampling. The default
+sampler used by PyMC3 is the NUTS sampler, on which you can learn more about <a href="https://arxiv.org/abs/1111.4246" target="_blank">here</a>. 
+More traditional Monte Carlo samplers for Bayesian inference are Metropolis-Hastings and Gibbs. I may discuss differences between Monte Carlo 
+samplers in a future post.
+</p>
+<div>
+    <pre><code>
+        with pm.Model() as reg_model:
+            # Use all features except for time.
+            x = pm.Data('x', X_train[:,:-1])
+            beta_prior_mu = np.zeros(num_feats-1)
+            sd_dist = pm.Exponential.dist(1.0, shape=num_feats-1)
+            chol, corr, stds = pm.LKJCholeskyCov('chol_cov', n=num_feats-1, eta=2, sd_dist
+            # set priors
+            beta = pm.MvNormal('beta', beta_prior_mu, chol=chol, shape=num_feats-1)
+            sigma = pm.HalfCauchy('sigma', beta=20)
+            mu = pm.Deterministic('mu', pm.math.dot(x,beta))
+            # define likelihood
+            likelihood = pm.Normal('likelihood', mu=mu, sd=sigma, observed=y_train)
+            # sample
+            trace = pm.sample(5000, chains=2, tune=4000, target_accept=0.95)
+    </code></pre>
+</div>
+<p>
+    Now let's generate predictions on both the train and test data.
+</p>
+<div>
+    <pre><code>
+        # sample posterior predictive distribution for train and test sets to evaluate model
+        with reg_model:
+            # update values of predictors
+            pm.set_data({"x": X_test[:,:-1]})
+            # use the updated values and predict outcomes and probabilities:
+            model_preds_test = pm.sample_posterior_predictive(trace, var_names=["mu"])
+
+        with reg_model:
+            # update values of predictors
+            pm.set_data({"x": X_train[:,:-1]})
+            # use the updated values and predict outcomes and probabilities:
+            model_preds_train = pm.sample_posterior_predictive(trace, var_names=["mu"])
+    </code></pre>
+</div>
+<p>
+    So what do our results look like? Well check them out below. Notice that we were able to generate 95% credible sets around our predictions as well.
+    But how well did our model really do? In the next article we'll discuss how the credible sets were generated, metrics to evaluate Bayesian models, and
+    Bayesian model selection techniques.
+</p>
+
+<div class="media mb-3 justify-content-center">
+    <img src="/assets/images/2021-01-18-bayesp2-fig1.svg" class="mr-3 ml-3 w-50">
+</div>

@@ -38,7 +38,7 @@ Some notes on how to write my blog post(s) on my Bayesian Statistics Course Fina
             - Fitting bayes regression models in PyMC3
             - Next post
         - Part 2
-            - Model evaluation
+            - Model evaluation: trace plots, metrics, bayesian r^2, credible sets, feature selection
             - Model selection techniques
             - Evaluating and selecting models in PyMC3
             - Next post

@@ -5,12 +5,12 @@ title: Using Bayesian Methods and PyMC3 to Predict Flu Incidence&#58; Part 1
 date: 2021-01-18
 excerpt: > 
     <p class="aboutme-size-font">
-        In Part 1 of our exploration we'll discuss the concepts behind Bayesian regression and some implementations in PyMC3.
+        In Part 1 of our exploration we'll discuss the concepts behind Bayesian regression and implementation in PyMC3.
     </p>
 ---
 <hr>
 <p class="aboutme-size-font">
-    In Part 1 of our exploration we'll discuss the concepts behind Bayesian regression and some implementations in PyMC3. This post assumes basic familiarity
+    In Part 1 of our exploration we'll discuss the concepts behind Bayesian regression and implementation in PyMC3. This post assumes basic familiarity
     with statistical concepts such as priors, posteriors, and likelihoods. If you're wondering how you got here or what I'm talking about, check out my first post
     <a href="https://arslan-aziz.com/2020/01/05/bayesp1.html">here!</a>
     <br>
@@ -45,10 +45,10 @@ excerpt: >
 </div>
 <p>
     In the Bayesian context we treat the regression coefficients as well as parameters for the error term epsilon as random variables, thus each needs a prior. 
-    A typical choice of prior for the error term is the HalfCauchy which is parametrized by beta. A larger beta value widens the distribution resulting in a
+    A typical choice of prior for the error term is the HalfCauchy which is parametrized by scale parameter beta. A larger beta value widens the distribution resulting in a
     more non-informative prior. On the regression coefficients a typical choice of prior is the multivariate normal distribution (MVN) with dimensionality equal
-    to the number of coefficients. As opposed to independent priors on each coefficient, MVN imposes regularization on the coefficients.
-    Further, the covariance matrix of MVN can be specified as well. In fact a covariance matrix that is the identity matrix induces L2 regularization (aka ridge regression).
+    to the number of coefficients. As opposed to independent priors on each coefficient, MVN imposes regularization on the coefficients by specification
+    of its covariance matrix. In fact a covariance matrix that is the identity matrix induces L2 regularization (aka ridge regression).
 </p>
 <div style="overflow-x: auto; display: block;">
     <p>
@@ -77,7 +77,6 @@ excerpt: >
         import scipy as sp
         from sklearn.preprocessing import StandardScaler
         from theano import shared
-        from statsmodels.tsa.seasonal import seasonal_decompose
     </code></pre>
 </div>
 <p>
@@ -87,7 +86,7 @@ excerpt: >
 <div>
     <pre><code>
         num_obs = data_mat.shape[0]
-        num_train = 100 # todo set this as proportion
+        num_train = 100
         num_test = num_obs - num_train
         num_feats = data_mat.shape[1] - 1
         X_train = data_mat[:num_train, 1:]
@@ -99,8 +98,9 @@ excerpt: >
 <p>
 We first instantiate a PyMC Model object and within its context we define our model. We need to specify distributions for all random variables
 we noted as well as the sampling distribution of our observations (regression function). We also set parameters for our MCMC sampling. The default
-sampler used by PyMC3 is the NUTS sampler, on which you can learn more about <a href="https://arxiv.org/abs/1111.4246">here</a>. More traditional Monte Carlo
-samplers for Bayesian inference are Metropolis-Hastings and Gibbs. I may discuss differences between Monte Carlo samplers in a future post.
+sampler used by PyMC3 is the NUTS sampler, on which you can learn more about <a href="https://arxiv.org/abs/1111.4246" target="_blank">here</a>. 
+More traditional Monte Carlo samplers for Bayesian inference are Metropolis-Hastings and Gibbs. I may discuss differences between Monte Carlo 
+samplers in a future post.
 </p>
 <div>
     <pre><code>
